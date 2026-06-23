@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor Undangan</title><style>
+
+body{
+font-family:Segoe UI,sans-serif;
+background:#f5f7fb;
+padding:20px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+h2{
+margin-bottom:20px;
+color:#7c3aed;
+}
+
+.form-group{
+margin-bottom:15px;
+}
+
+label{
+display:block;
+margin-bottom:5px;
+font-weight:600;
+}
+
+input,textarea,select{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:10px;
+}
+
+button{
+background:#7c3aed;
+color:white;
+padding:14px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.preview{
+margin-top:20px;
+}
+
+.preview img{
+width:100%;
+max-height:300px;
+object-fit:cover;
+border-radius:15px;
+display:none;
+}
+
+</style></head>
+<body><div class="container"><h2>💌 Buat Undangan Baru</h2><form id="invitationForm"><div class="form-group">
+<label>Nama Mempelai Pria</label>
+<input type="text" id="groomName" required>
+</div><div class="form-group">
+<label>Nama Mempelai Wanita</label>
+<input type="text" id="brideName" required>
+</div><div class="form-group">
+<label>Tanggal Acara</label>
+<input type="date" id="eventDate" required>
+</div><div class="form-group">
+<label>Jam Acara</label>
+<input type="time" id="eventTime" required>
+</div><div class="form-group">
+<label>Lokasi</label>
+<textarea id="location"></textarea>
+</div><div class="form-group">
+<label>Google Maps</label>
+<input type="text" id="maps">
+</div><div class="form-group">
+<label>Cerita Cinta</label>
+<textarea id="story"></textarea>
+</div><div class="form-group">
+<label>Tema</label><select id="theme"><option value="luxury-gold">
+Luxury Gold
+</option><option value="elegant-white">
+Elegant White
+</option><option value="floral-romantic">
+Floral Romantic
+</option></select></div><div class="form-group">
+<label>Foto Pengantin</label>
+<input type="file" id="photo">
+</div><div class="preview">
+<img id="previewImage">
+</div><button type="submit">
+💾 Simpan Undangan
+</button></form></div><script type="module">
+
+import {
+auth,
+db,
+storage
+}
+from "./firebase/firebase-config.js";
+
+import {
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+import {
+collection,
+addDoc,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+import {
+ref,
+uploadBytes,
+getDownloadURL
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
+
+const photoInput =
+document.getElementById("photo");
+
+const previewImage =
+document.getElementById("previewImage");
+
+photoInput.addEventListener("change",()=>{
+
+const file = photoInput.files[0];
+
+if(file){
+
+previewImage.src =
+URL.createObjectURL(file);
+
+previewImage.style.display =
+"block";
+
+}
+
+});
+
+onAuthStateChanged(auth,(user)=>{
+
+if(!user){
+
+window.location.href =
+"login.html";
+
+}
+
+});
+
+document
+.getElementById("invitationForm")
+.addEventListener("submit",
+async(e)=>{
+
+e.preventDefault();
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+let imageUrl = "";
+
+const file =
+photoInput.files[0];
+
+if(file){
+
+const storageRef =
+ref(
+storage,
+"invitations/" +
+Date.now() +
+file.name
+);
+
+await uploadBytes(
+storageRef,
+file
+);
+
+imageUrl =
+await getDownloadURL(
+storageRef
+);
+
+}
+
+await addDoc(
+collection(db,"invitations"),
+{
+
+uid:user.uid,
+
+groomName:
+groomName.value,
+
+brideName:
+brideName.value,
+
+eventDate:
+eventDate.value,
+
+eventTime:
+eventTime.value,
+
+location:
+location.value,
+
+maps:
+maps.value,
+
+story:
+story.value,
+
+theme:
+theme.value,
+
+image:imageUrl,
+
+createdAt:
+serverTimestamp()
+
+});
+
+alert("Undangan berhasil disimpan");
+
+window.location.href =
+"dashboard.html";
+
+});
+
+</script></body>
+</html>
