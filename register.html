@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Akun - UndanganPro</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"><style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#7c3aed,#ec4899);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:420px;
+background:white;
+padding:35px;
+border-radius:20px;
+box-shadow:0 15px 35px rgba(0,0,0,.2);
+}
+
+.logo{
+text-align:center;
+font-size:28px;
+font-weight:bold;
+color:#7c3aed;
+margin-bottom:25px;
+}
+
+.input-group{
+margin-bottom:15px;
+}
+
+.input-group label{
+display:block;
+margin-bottom:5px;
+font-weight:600;
+}
+
+.input-group input{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:10px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+background:#7c3aed;
+color:white;
+font-size:16px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.login-link{
+text-align:center;
+margin-top:15px;
+}
+
+.login-link a{
+color:#7c3aed;
+text-decoration:none;
+font-weight:bold;
+}
+</style></head>
+<body><div class="card"><div class="logo">
+UndanganPro
+</div><form id="registerForm"><div class="input-group">
+<label>Nama Lengkap</label>
+<input type="text" id="name" required>
+</div><div class="input-group">
+<label>Email</label>
+<input type="email" id="email" required>
+</div><div class="input-group">
+<label>Password</label>
+<input type="password" id="password" required>
+</div><button type="submit" class="btn">
+Daftar Sekarang
+</button></form><div class="login-link">
+Sudah punya akun?
+<a href="login.html">Login</a>
+</div></div><script type="module">
+
+import {
+createUserWithEmailAndPassword
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+import {
+doc,
+setDoc
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+import {
+auth,
+db
+}
+from "./firebase/firebase-config.js";
+
+document.getElementById("registerForm")
+.addEventListener("submit", async(e)=>{
+
+e.preventDefault();
+
+const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
+
+try{
+
+const userCredential=
+await createUserWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+await setDoc(
+doc(db,"users",userCredential.user.uid),
+{
+name:name,
+email:email,
+plan:"free",
+createdAt:new Date()
+}
+);
+
+alert("Registrasi berhasil!");
+
+window.location.href="dashboard.html";
+
+}catch(error){
+
+alert(error.message);
+
+}
+
+});
+
+</script></body>
+</html>
