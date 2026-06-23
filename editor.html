@@ -190,11 +190,21 @@ await uploadBytes(storageRef, file);
 imageUrl = await getDownloadURL(storageRef);
 
 }
+const slug =
+(
+document.getElementById("groomName").value +
+"-dan-" +
+document.getElementById("brideName").value
+)
+.toLowerCase()
+.replaceAll(" ","-");
 
 await addDoc(
 collection(db, "invitations"),
 {
 uid: user.uid,
+
+slug: slug,
 
 groomName: document.getElementById("groomName").value,
 
@@ -221,7 +231,6 @@ createdAt: serverTimestamp()
 alert("Undangan berhasil disimpan");
 
 window.location.href = "dashboard.html";
-
 } catch (error) {
 
 console.error(error);
