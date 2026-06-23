@@ -161,85 +161,78 @@ window.location.href =
 
 document
 .getElementById("invitationForm")
-.addEventListener("submit",
-async(e)=>{
+.addEventListener("submit", async (e) => {
 
 e.preventDefault();
 
+try {
+
 const user = auth.currentUser;
 
-if(!user) return;
+if (!user) {
+alert("Silakan login terlebih dahulu");
+return;
+}
 
 let imageUrl = "";
 
-const file =
-photoInput.files[0];
+const file = photoInput.files[0];
 
-if(file){
+if (file) {
 
-const storageRef =
-ref(
+const storageRef = ref(
 storage,
-"invitations/" +
-Date.now() +
-file.name
+"invitations/" + Date.now() + "-" + file.name
 );
 
-await uploadBytes(
-storageRef,
-file
-);
+await uploadBytes(storageRef, file);
 
-imageUrl =
-await getDownloadURL(
-storageRef
-);
+imageUrl = await getDownloadURL(storageRef);
 
 }
 
 await addDoc(
-collection(db,"invitations"),
+collection(db, "invitations"),
 {
+uid: user.uid,
 
-uid:user.uid,
+groomName: document.getElementById("groomName").value,
 
-groomName:
-groomName.value,
+brideName: document.getElementById("brideName").value,
 
-brideName:
-brideName.value,
+eventDate: document.getElementById("eventDate").value,
 
-eventDate:
-eventDate.value,
+eventTime: document.getElementById("eventTime").value,
 
-eventTime:
-eventTime.value,
+location: document.getElementById("location").value,
 
-location:
-location.value,
+maps: document.getElementById("maps").value,
 
-maps:
-maps.value,
+story: document.getElementById("story").value,
 
-story:
-story.value,
+theme: document.getElementById("theme").value,
 
-theme:
-theme.value,
+image: imageUrl,
 
-image:imageUrl,
-
-createdAt:
-serverTimestamp()
-
-});
+createdAt: serverTimestamp()
+}
+);
 
 alert("Undangan berhasil disimpan");
 
-window.location.href =
-"dashboard.html";
+window.location.href = "dashboard.html";
+
+} catch (error) {
+
+console.error(error);
+
+alert(
+error.code + "\n" +
+error.message
+);
+
+}
 
 });
-
 </script></body>
 </html>
