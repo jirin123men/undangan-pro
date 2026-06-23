@@ -1,0 +1,236 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview Undangan</title><style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+background:#fff;
+color:#333;
+}
+
+.hero{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:linear-gradient(135deg,#7c3aed,#ec4899);
+color:white;
+padding:20px;
+}
+
+.hero h1{
+font-size:50px;
+margin-bottom:15px;
+}
+
+.btn{
+display:inline-block;
+padding:14px 25px;
+background:white;
+color:#7c3aed;
+border-radius:30px;
+text-decoration:none;
+font-weight:bold;
+}
+
+.section{
+max-width:900px;
+margin:auto;
+padding:60px 20px;
+}
+
+.image{
+width:100%;
+border-radius:20px;
+margin-bottom:25px;
+}
+
+.countdown{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-top:20px;
+}
+
+.box{
+background:#7c3aed;
+color:white;
+padding:15px;
+border-radius:12px;
+min-width:80px;
+text-align:center;
+}
+
+.story{
+line-height:1.8;
+margin-top:20px;
+}
+
+.maps-btn{
+display:inline-block;
+padding:12px 20px;
+background:#7c3aed;
+color:white;
+text-decoration:none;
+border-radius:10px;
+margin-top:15px;
+}
+
+</style></head>
+<body><section class="hero"><div><h1 id="coupleNames">
+Loading...
+</h1><p>
+Menuju Hari Bahagia
+</p><a href="#content" class="btn">
+Buka Undangan
+</a></div></section><div id="content" class="section"><img
+id="photo"
+class="image">
+
+<h2 id="title"></h2><div class="countdown"><div class="box">
+<div id="days">0</div>
+Hari
+</div><div class="box">
+<div id="hours">0</div>
+Jam
+</div><div class="box">
+<div id="minutes">0</div>
+Menit
+</div><div class="box">
+<div id="seconds">0</div>
+Detik
+</div></div><div class="story" id="story">
+</div><br><a
+id="mapsBtn"
+class="maps-btn"
+target="_blank">
+Lihat Lokasi
+</a>
+
+</div><script type="module">
+
+import {
+db
+}
+from "./firebase/firebase-config.js";
+
+import {
+collection,
+query,
+orderBy,
+limit,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+const q =
+query(
+collection(db,"invitations"),
+orderBy("createdAt","desc"),
+limit(1)
+);
+
+const snap =
+await getDocs(q);
+
+snap.forEach((doc)=>{
+
+const data = doc.data();
+
+document
+.getElementById("coupleNames")
+.innerHTML =
+data.groomName +
+" & " +
+data.brideName;
+
+document
+.getElementById("title")
+.innerHTML =
+data.groomName +
+" & " +
+data.brideName;
+
+document
+.getElementById("story")
+.innerHTML =
+data.story;
+
+document
+.getElementById("photo")
+.src =
+data.image;
+
+document
+.getElementById("mapsBtn")
+.href =
+data.maps;
+
+startCountdown(
+data.eventDate
+);
+
+});
+
+function startCountdown(date){
+
+const target =
+new Date(date).getTime();
+
+setInterval(()=>{
+
+const now =
+new Date().getTime();
+
+const distance =
+target - now;
+
+document
+.getElementById("days")
+.innerHTML =
+Math.floor(
+distance/(1000*60*60*24)
+);
+
+document
+.getElementById("hours")
+.innerHTML =
+Math.floor(
+(distance%(1000*60*60*24))
+/
+(1000*60*60)
+);
+
+document
+.getElementById("minutes")
+.innerHTML =
+Math.floor(
+(distance%(1000*60*60))
+/
+(1000*60)
+);
+
+document
+.getElementById("seconds")
+.innerHTML =
+Math.floor(
+(distance%(1000*60))
+/
+1000
+);
+
+},1000);
+
+}
+
+</script></body>
+</html>
